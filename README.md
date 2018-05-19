@@ -5,7 +5,9 @@
 - Spring Cloud 版本：Edgware.SR3
 - Spring Boot 版本：1.5.13.RELEASE
 
-各模块说明
+[TOC]
+
+## 各模块说明
 
 服务 | 说明 | URL
 ---|---|---
@@ -82,7 +84,8 @@ spring.cloud.config.server.git.username=your username
 spring.cloud.config.server.git.password=your password
 ```
 
-## TODO 高可用
+### 高可用
+TODO
 
 Config Server 的高可用需要将 COnfig Server 注册到 Eureka Service 上去，但是会存在互相依赖的问题。
 
@@ -211,10 +214,7 @@ TODO: 断路器的开关阈值（目前：Hystrix 是5秒20次）
 
 Josh 觉得这样写不优雅，建议使用 spring-retry
 
-## Turbine
-
-
-## Spring Retry
+## Spring Retry 重试
 Spring Retry是从spring batch独立出来的一个能功能，主要实现了重试和熔断。
 
 依赖
@@ -245,7 +245,7 @@ public int fallback(RuntimeException ex)
 
 改成断路器 `@CircuitBreaker`
 
-## Hystrix Dashboard
+## Hystrix Dashboard 断路器监控
 ```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
@@ -259,7 +259,7 @@ public int fallback(RuntimeException ex)
 
 > 注意：被测试服务需要依赖：actuator
 
-## Turbine
+## Turbine 断路器聚合
 
 新建工程 **turbine-service**
 
@@ -312,66 +312,14 @@ zuul 的配置
 zuul:
   routes:
     api-a:
-      path: /api-a/**
-      serviceId: service-ribbon
+      path: /api-hi/**
+      serviceId: hi-service
     api-b:
-      path: /api-b/**
-      serviceId: service-feign
+      path: /api-hey/**
+      serviceId: hey-service
 ```
 
-### 服务过滤做安全验证
-
-```java
-@Component
-public class MyFilter extends ZuulFilter{
-
-    private static Logger log = LoggerFactory.getLogger(MyFilter.class);
-    @Override
-    public String filterType() {
-        return "pre";
-    }
-
-    @Override
-    public int filterOrder() {
-        return 0;
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        return true;
-    }
-
-    @Override
-    public Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        log.info(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
-        Object accessToken = request.getParameter("token");
-        if(accessToken == null) {
-            log.warn("token is empty");
-            ctx.setSendZuulResponse(false);
-            ctx.setResponseStatusCode(401);
-            try {
-                ctx.getResponse().getWriter().write("token is empty");
-            }catch (Exception e){}
-
-            return null;
-        }
-        log.info("ok");
-        return null;
-    }
-}
-```
-- filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下： 
-    - pre：路由之前
-    - routing：路由之时
-    - post： 路由之后
-    - error：发送错误调用
-    - filterOrder：过滤的顺序
-    - shouldFilter：这里可以写逻辑判断，是否要过滤，本文true,永远过滤。
-    - run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。
-    
-## Zipkin 链路跟踪
+## Zipkin 链路追踪
 
 新建工程 **zipkin-server**
 
@@ -414,9 +362,11 @@ public class MyFilter extends ZuulFilter{
 Zipkin 服务端地址配置
 `spring.zipkin.base-url=http://localhost:9411`
 
-然后跨服务调用就会在控制台查到跟踪记录
+然后跨服务调用就会在控制台查到跟踪记录 http://localhost:9411
 
-## Sleuth
+## Sleuth 分布式追踪
 
 TODO
+
+## Spring Cloud Bus
 
