@@ -15,6 +15,7 @@ Hello Service | 测试服务 | http://localhost:9000/
 Hello Client | 测试客户端 | http://localhost:9999/
 Hystrix | 断路器 |
 Hystrix Dashboard | 断路器面板 | http://localhost:8010/hystrix.html
+Turbine | 断路器聚合 | http://localhost:8769/turbine.stream
 Zipkin | 链路追踪 |  http://localhost:9411/
 Zuul | 动态路由 |
 Ribbon | 客户端负载均衡 |
@@ -258,6 +259,41 @@ public int fallback(RuntimeException ex)
 
 > 注意：被测试服务需要依赖：actuator
 
+## Turbine
+
+新建工程 **turbine-service**
+
+依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-eureka</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-turbine</artifactId>
+</dependency>
+```
+启用 `@EnableTurbine`
+
+端口开在 8769
+
+配置
+```properties
+security.basic.enabled=false
+turbine.aggregator.cluster-config=default
+turbine.app-config=hello-service,hello-client
+turbine.cluster-name-expression=new String("default")
+```
+http://localhost:8769/turbine.stream
+
+到 HystrixDashboard 监控 turbine，就可以看到多个断路器状态
+
+http://localhost:8010/hystrix/monitor?stream=http%3A%2F%2Flocalhost%3A8769%2Fturbine.stream
 
 ## Zuul 路由网关
 ```xml
@@ -379,4 +415,8 @@ Zipkin 服务端地址配置
 `spring.zipkin.base-url=http://localhost:9411`
 
 然后跨服务调用就会在控制台查到跟踪记录
+
+## Sleuth
+
+TODO
 
