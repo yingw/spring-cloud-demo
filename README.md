@@ -8,7 +8,7 @@
 各模块说明
 
 服务 | 说明 | URL
----|---|---|---
+---|---|---
 Config Server | 配置中心 |http://localhost:8888/
 Eureka Service | 注册中心、服务发现 | http://localhost:8761/, http://localhost:8762/
 Hello Service | 测试服务 | http://localhost:9000/
@@ -16,10 +16,10 @@ Hello Client | 测试客户端 | http://localhost:9999/
 Hystrix | 断路器 |
 Hystrix Dashboard | 断路器面板 | http://localhost:8010/hystrix.html
 Zipkin | 链路追踪 |  http://localhost:9411/
-Zuul | 动态路由 |||
-Ribbon | 客户端负载均衡
-Feign | 声明式 HTTP 客户端
-Spring Retry | 重试
+Zuul | 动态路由 |
+Ribbon | 客户端负载均衡 |
+Feign | 声明式 HTTP 客户端 |
+Spring Retry | 重试 |
 
 >建议不要使用 spring.io 的临时库。
 
