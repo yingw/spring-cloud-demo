@@ -8,12 +8,12 @@
 ## 目录
 - [Spring Cloud Demo](#spring-cloud-demo)
   * [各模块说明](#%E5%90%84%E6%A8%A1%E5%9D%97%E8%AF%B4%E6%98%8E)
-  * [配置中心 Config Server](#%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83-config-server)
+  * [Config Server 配置中心](#config-server-%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83)
     + [使用文件配置库](#%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E9%85%8D%E7%BD%AE%E5%BA%93)
     + [客户端配置](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE)
     + [使用 git 的配置](#%E4%BD%BF%E7%94%A8-git-%E7%9A%84%E9%85%8D%E7%BD%AE)
     + [高可用](#%E9%AB%98%E5%8F%AF%E7%94%A8)
-  * [注册中心 Eureka Service](#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83-eureka-service)
+  * [Eureka Service 注册中心](#eureka-service-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83)
     + [客户端](#%E5%AE%A2%E6%88%B7%E7%AB%AF)
   * [Ribbon 负载均衡](#ribbon-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1)
   * [Feign 声明式 HTTP 客户端](#feign-%E5%A3%B0%E6%98%8E%E5%BC%8F-http-%E5%AE%A2%E6%88%B7%E7%AB%AF)
@@ -35,19 +35,20 @@ Config Server | 配置中心 |http://localhost:8888/
 Eureka Service | 注册中心、服务发现 | http://localhost:8761/, http://localhost:8762/
 Hello Service | 测试服务 | http://localhost:9000/
 Hello Client | 测试客户端 | http://localhost:9999/
-Hystrix | 断路器 |
-Hystrix Dashboard | 断路器面板 | http://localhost:8010/hystrix.html
-Turbine | 断路器聚合 | http://localhost:8769/turbine.stream
-Zipkin | 链路追踪 |  http://localhost:9411/
-Zuul | 动态路由 |
 Ribbon | 客户端负载均衡 |
 Feign | 声明式 HTTP 客户端 |
+Hystrix | 断路器 |
 Spring Retry | 重试 |
+Hystrix Dashboard | 断路器面板 | http://localhost:8010/hystrix.html
+Turbine | 断路器聚合 | http://localhost:8769/turbine.stream
+Zuul | 动态路由 | http://localhost:8080/api-hi
+Zipkin | 链路追踪 |  http://localhost:9411/
+Sleuth | 链路追踪 | 
 
 >建议不要使用 spring.io 的临时库。
 
 
-## 配置中心 Config Server
+## Config Server 配置中心
 
 创建 `config-server` 项目
 
@@ -110,7 +111,7 @@ TODO
 Config Server 的高可用需要将 COnfig Server 注册到 Eureka Service 上去，但是会存在互相依赖的问题。
 
 
-## 注册中心 Eureka Service
+## Eureka Service 注册中心
 
 新建项目，依赖于 **Eureka Server**, **Config Client**
 ```xml
@@ -316,7 +317,35 @@ http://localhost:8769/turbine.stream
 http://localhost:8010/hystrix/monitor?stream=http%3A%2F%2Flocalhost%3A8769%2Fturbine.stream
 
 ## Zuul 路由网关
+
+新建工程 api-gateway
+
+依赖
 ```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-eureka</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-zipkin</artifactId>
+</dependency>
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-zuul</artifactId>
@@ -325,19 +354,22 @@ http://localhost:8010/hystrix/monitor?stream=http%3A%2F%2Flocalhost%3A8769%2Ftur
 
 `@EnableZuulProxy`
 
-Zuul 的功能很多：路由、安全、转发
+Zuul 的功能很多：路由、安全、限流
 
-zuul 的配置
+zuul 的路由配置
 ```yaml
 zuul:
   routes:
     api-a:
       path: /api-hi/**
-      serviceId: hi-service
+      serviceId: hello-client
     api-b:
       path: /api-hey/**
-      serviceId: hey-service
+      serviceId: hello-service
 ```
+
+启动测试：
+http://localhost:8080/api-hi 和 http://localhost:8080/api-hey/hi
 
 ## Zipkin 链路追踪
 

@@ -1,0 +1,8 @@
+zuul:
+  routes:
+    api-a:
+      path: /api-hi/**
+      serviceId: hello-client
+    api-b:
+      path: /api-hey/**
+      serviceId: hello-service
