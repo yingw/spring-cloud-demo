@@ -422,3 +422,60 @@ TODO
 
 ## Spring Cloud Bus
 
+# More MicroService
+
+>更多微服务架构的组件选择
+
+除了使用 Spring Cloud 和 Netflix 相关套件，还可以选用其他的组件实现，例如 Consul、Etcd、Zookeeper 等等
+
+
+## 各模块说明
+
+服务 | 说明 | URL
+---|---|---
+Apollo | 配置中心 |http://localhost:8888/
+Consul | 注册中心、服务发现 | http://localhost:8500/
+Consul Service 1 | 测试服务 | http://localhost:8501/
+Consul Service 2 | 测试服务 | http://localhost:8502/
+
+## Consul 服务发现和服务配置
+
+> HashiCorp 的 Consul，Service Discovery and Configuration Made Easy
+
+下载 Consul: https://www.consul.io/downloads.html
+
+启动 Consul
+```
+consul.exe agent -dev
+```
+访问：http://localhost:8500/
+
+新建项目 **consul-service1**
+
+依赖
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+`@EnableDiscoveryClient`
+
+配置 Consul 地址、端口，自己的端口
+```properties
+spring.cloud.consul.port=8500
+spring.cloud.consul.host=localhost
+spring.cloud.consul.discovery.instance-id=consul-service1
+spring.application.name=consul-service1
+server.port=8501
+```
+
